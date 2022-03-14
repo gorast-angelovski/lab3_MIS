@@ -4,9 +4,6 @@ import 'package:student_organizer/exam.dart';
 import 'exam.dart';
 
 class ListDetailsScreen extends StatelessWidget {
-  //final ExamApplication item;
-
-  //ListDetailsScreen(this.item);
   static const routeName = '/list_detail';
   @override
   Widget build(BuildContext context) {

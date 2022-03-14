@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:student_organizer/blocs/list_event.dart';
 import 'package:student_organizer/exam.dart';
 
+import 'exam_calendar.dart';
 import 'list_detail_screen.dart';
 import 'blocs/list_bloc.dart';
 import 'blocs/list_event.dart';
@@ -123,6 +124,24 @@ class _MyAppState extends State<MyApp> {
         : AppBar(
             title: Text(title),
             actions: <Widget>[
+              BlocBuilder<ListBloc, ListState>(builder: (context, state) {
+                return state.runtimeType == ListEmptyState
+                    ? GestureDetector(
+                        onTap: () => null,
+                        child: const Padding(
+                          padding: EdgeInsets.only(right: 20),
+                          child: Icon(Icons.calendar_today),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () => _openCalendarScreen(
+                            context, (state as ListElementsState).elements),
+                        child: const Padding(
+                          padding: EdgeInsets.only(right: 20),
+                          child: Icon(Icons.calendar_today),
+                        ),
+                      );
+              }),
               GestureDetector(
                 onTap: () => _showHideAddMenu(),
                 child: !isVisible
@@ -307,7 +326,9 @@ class _MyAppState extends State<MyApp> {
                           ),
                           child: ListTile(
                             title: Text(
-                              (state as ListElementsState).elements![index].courseName,
+                              (state as ListElementsState)
+                                  .elements![index]
+                                  .courseName,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).primaryColorDark),
@@ -317,8 +338,10 @@ class _MyAppState extends State<MyApp> {
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
-                              onPressed: () => _deleteItem(context,
-                                  (state as ListElementsState).elements![index]),
+                              onPressed: () => _deleteItem(
+                                  context,
+                                  (state as ListElementsState)
+                                      .elements![index]),
                             ),
                             onTap: () => _showDetail(context,
                                 (state as ListElementsState).elements![index]),
@@ -340,6 +363,13 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  void _openCalendarScreen(BuildContext context, elements) {
+    Navigator.of(context).pushNamed(
+      '/calendar',
+      arguments: elements,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Platform.isIOS
@@ -349,22 +379,17 @@ class _MyAppState extends State<MyApp> {
               navigationBar: _createAppBar(context),
             ),
           )
-        :
-    // BlocProvider<ListBloc>(
-            // create: (BuildContext context) =>
-            //     ListBloc()..add(ListInitializedEvent()),
-            // child:
-        MaterialApp(
-              title: title,
-              initialRoute: '/',
-              routes: {
-                '/': (ctx) => Scaffold(
-                      appBar: _createAppBar(context),
-                      body: _createBody(context),
-                    ),
-                ListDetailsScreen.routeName: (ctx) => ListDetailsScreen(),
-              },
-            // ),
+        : MaterialApp(
+            title: title,
+            initialRoute: '/',
+            routes: {
+              '/': (ctx) => Scaffold(
+                    appBar: _createAppBar(context),
+                    body: _createBody(context),
+                  ),
+              ListDetailsScreen.routeName: (ctx) => ListDetailsScreen(),
+              '/calendar': (ctx) => CalendarScreen(),
+            },
           );
   }
 }
