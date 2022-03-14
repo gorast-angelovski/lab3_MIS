@@ -11,8 +11,8 @@ class ListInitState extends ListElementsState {
 class ListEmptyState extends ListState {}
 
 class ListElementsState extends ListState {
-  late List<ExamApplication> elements;
-  ListElementsState({elements});
+  List<ExamApplication>? elements;
+  ListElementsState({this.elements});
 }
 
 class ListError extends ListState{

@@ -11,7 +11,14 @@ import 'blocs/list_event.dart';
 import 'blocs/list_state.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiBlocProvider(providers: [
+      BlocProvider<ListBloc>(
+        create: (BuildContext context) =>
+            ListBloc()..add(ListInitializedEvent()),
+      ),
+    ], child: MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -70,7 +77,8 @@ class _MyAppState extends State<MyApp> {
   String _hour = "17";
   String _minute = "30";
 
-  void addExamApplication(BuildContext ctx, course, year, month, day, hour, minute) {
+  void addExamApplication(
+      BuildContext ctx, course, year, month, day, hour, minute) {
     final bloc = BlocProvider.of<ListBloc>(ctx);
     bloc.add(ListElementAddedEvent(
         element: ExamApplication(
@@ -79,9 +87,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _deleteItem(BuildContext ctx, ExamApplication examApplication) {
-    // setState(() {
-    //   elements.remove(examApplication);
-    // });
     final bloc = BlocProvider.of<ListBloc>(ctx);
     bloc.add(ListElementDeletedEvent(element: examApplication));
   }
@@ -115,24 +120,27 @@ class _MyAppState extends State<MyApp> {
               ],
             ),
           )
-        : AppBar(title: Text(title), actions: <Widget>[
-            GestureDetector(
-              onTap: () => _showHideAddMenu(),
-              child: !isVisible
-                  ? const Padding(
-                      padding: EdgeInsets.only(right: 20),
-                      child: Icon(
-                        Icons.add,
+        : AppBar(
+            title: Text(title),
+            actions: <Widget>[
+              GestureDetector(
+                onTap: () => _showHideAddMenu(),
+                child: !isVisible
+                    ? const Padding(
+                        padding: EdgeInsets.only(right: 20),
+                        child: Icon(
+                          Icons.add,
+                        ),
+                      )
+                    : const Padding(
+                        padding: EdgeInsets.only(right: 20),
+                        child: Icon(
+                          Icons.remove,
+                        ),
                       ),
-                    )
-                  : const Padding(
-                      padding: EdgeInsets.only(right: 20),
-                      child: Icon(
-                        Icons.remove,
-                      ),
-                    ),
-            ),
-          ]);
+              ),
+            ],
+          );
   }
 
   Widget _createBody(BuildContext context) {
@@ -261,7 +269,7 @@ class _MyAppState extends State<MyApp> {
                       _hour = _h.text;
                       _minute = _min.text;
                       addExamApplication(
-                        context,
+                          context,
                           _course,
                           int.parse(_year),
                           int.parse(_month),
@@ -289,7 +297,7 @@ class _MyAppState extends State<MyApp> {
                   )
                 : Center(
                     child: ListView.builder(
-                      itemCount: (state as ListElementsState).elements.length,
+                      itemCount: (state as ListElementsState).elements?.length,
                       itemBuilder: (context, index) {
                         return Card(
                           elevation: 5,
@@ -299,19 +307,21 @@ class _MyAppState extends State<MyApp> {
                           ),
                           child: ListTile(
                             title: Text(
-                              (state).elements[index].courseName,
+                              (state as ListElementsState).elements![index].courseName,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).primaryColorDark),
                             ),
                             subtitle: Text(
-                              "${(state).elements[index].dateTime.year.toString()}-${(state).elements[index].dateTime.month.toString().padLeft(2, '0')}-${(state).elements[index].dateTime.day.toString().padLeft(2, '0')} ${(state).elements[index].dateTime.hour.toString().padLeft(2, '0')}:${(state).elements[index].dateTime.minute.toString().padLeft(2, '0')}",
+                              "${(state).elements![index].dateTime.year.toString()}-${(state).elements![index].dateTime.month.toString().padLeft(2, '0')}-${(state).elements![index].dateTime.day.toString().padLeft(2, '0')} ${(state).elements![index].dateTime.hour.toString().padLeft(2, '0')}:${(state).elements![index].dateTime.minute.toString().padLeft(2, '0')}",
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
-                              onPressed: () => _deleteItem(context, (state as ListElementsState).elements[index]),
+                              onPressed: () => _deleteItem(context,
+                                  (state as ListElementsState).elements![index]),
                             ),
-                            onTap: () => _showDetail(context, (state as ListElementsState).elements[index]),
+                            onTap: () => _showDetail(context,
+                                (state as ListElementsState).elements![index]),
                           ),
                         );
                       },
@@ -319,38 +329,6 @@ class _MyAppState extends State<MyApp> {
                   );
           }),
         )
-        // Expanded(
-        //   child:
-        // ListView.builder(
-        //   itemCount: elements.length,
-        //   itemBuilder: (context, index) {
-        //     print(elements[index]);
-        //     return Card(
-        //       elevation: 5,
-        //       margin: const EdgeInsets.symmetric(
-        //         vertical: 8,
-        //         horizontal: 10,
-        //       ),
-        //       child: ListTile(
-        //         title: Text(
-        //           elements[index].courseName,
-        //           style: TextStyle(
-        //               fontWeight: FontWeight.bold,
-        //               color: Theme.of(context).primaryColorDark),
-        //         ),
-        //         subtitle: Text(
-        //           "${elements[index].dateTime.year.toString()}-${elements[index].dateTime.month.toString().padLeft(2, '0')}-${elements[index].dateTime.day.toString().padLeft(2, '0')} ${elements[index].dateTime.hour.toString().padLeft(2, '0')}:${elements[index].dateTime.minute.toString().padLeft(2, '0')}",
-        //         ),
-        //         trailing: IconButton(
-        //           icon: const Icon(Icons.delete),
-        //           onPressed: () => _deleteItem(elements[index]),
-        //         ),
-        //         onTap: () => _showDetail(context, elements[index]),
-        //       ),
-        //     );
-        //   },
-        // ),
-        // ),
       ],
     );
   }
@@ -371,10 +349,12 @@ class _MyAppState extends State<MyApp> {
               navigationBar: _createAppBar(context),
             ),
           )
-        : BlocProvider<ListBloc>(
-            create: (BuildContext context) =>
-                ListBloc()..add(ListInitializedEvent()),
-            child: MaterialApp(
+        :
+    // BlocProvider<ListBloc>(
+            // create: (BuildContext context) =>
+            //     ListBloc()..add(ListInitializedEvent()),
+            // child:
+        MaterialApp(
               title: title,
               initialRoute: '/',
               routes: {
@@ -384,7 +364,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                 ListDetailsScreen.routeName: (ctx) => ListDetailsScreen(),
               },
-            ),
+            // ),
           );
   }
 }
