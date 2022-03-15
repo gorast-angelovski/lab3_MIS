@@ -3,13 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:student_organizer/blocs/list_event.dart';
+import 'package:student_organizer/blocs/student_event.dart';
 import 'package:student_organizer/exam.dart';
 
+import 'blocs/student_bloc.dart';
 import 'exam_calendar.dart';
 import 'list_detail_screen.dart';
 import 'blocs/list_bloc.dart';
 import 'blocs/list_event.dart';
 import 'blocs/list_state.dart';
+import 'login.dart';
 
 void main() {
   runApp(
@@ -17,6 +20,10 @@ void main() {
       BlocProvider<ListBloc>(
         create: (BuildContext context) =>
             ListBloc()..add(ListInitializedEvent()),
+      ),
+      BlocProvider<StudentBloc>(
+        create: (BuildContext context) =>
+            StudentBloc()..add(StudentInitializedEvent()),
       ),
     ], child: MyApp()),
   );
@@ -381,9 +388,10 @@ class _MyAppState extends State<MyApp> {
           )
         : MaterialApp(
             title: title,
-            initialRoute: '/',
+            initialRoute: '/login',
             routes: {
-              '/': (ctx) => Scaffold(
+              '/login': (ctx) => LoginScreen(),
+              '/home': (ctx) => Scaffold(
                     appBar: _createAppBar(context),
                     body: _createBody(context),
                   ),

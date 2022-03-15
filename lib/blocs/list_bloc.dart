@@ -11,10 +11,10 @@ class ListBloc extends Bloc<ListEvent, ListState> {
       this._elements = [
         ExamApplication(
             courseName: "Mobilni Informaciski Sistemi",
-            dateTime: DateTime(2017, 9, 7, 17, 30)),
+            dateTime: DateTime(2022, 3, 21, 17, 30)),
         ExamApplication(
             courseName: "Voved vo Pametni Gradovi",
-            dateTime: DateTime(2017, 9, 7, 17, 30))
+            dateTime: DateTime(2022, 3, 20, 17, 30))
       ];
       ListInitState state = ListInitState();
       state.elements = this._elements;
@@ -23,8 +23,6 @@ class ListBloc extends Bloc<ListEvent, ListState> {
     on<ListElementAddedEvent>((event, emit){
       this._elements!.add((event.element as ExamApplication));
       emit(ListElementsState(elements: this._elements));
-      print("added");
-      print(event.element);
     });
     on<ListElementDeletedEvent>((event, emit){
       this._elements!.remove(event.element);
